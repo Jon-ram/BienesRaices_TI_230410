@@ -2,34 +2,94 @@ extends ../layout/index
 
 block contenido
     div.py-10
-        h1.text-4xl.my-10.font-extrabold.text-center Bienes 
-            span.font-normal Raíces  
-        h2.text-center.text-2xl.font-extrabold= pagina
+        h1.text-center.font-extrabold.my-10.text-4xl.text-black Bienes 
+            span.font-normal.text-orange-600 Raíces
+        h2.text-center.font-extrabold.text-2xl.text-gray-900= page
 
-        if errores 
+        if errores
             div(class="max-w-md mx-auto my-10")
                 each error in errores
-                    p.bg-red-600.text-white.uppercase.text-xs.text-center.p-2.mb-1.font-bold= error.msg
+                    div(class="bg-red-600 text-white p-4 rounded-md flex items-center justify-between mb-2 alert fade-in")
+                        // Iconos según tipo de error
+                        if error.msg == "El nombre no puede ir vacío"
+                            i(class="fas fa-user-times mr-2")  
+                        else if error.msg == "El correo electrónico es un campo obligatorio"
+                            i(class="fas fa-envelope-open-text mr-2")  
+                        else if error.msg == "El correo electrónico no tiene el formato correcto"
+                            i(class="fas fa-exclamation-triangle mr-2")
+                        else if error.msg == "La contraseña es un campo obligatorio"
+                            i(class="fas fa-key mr-2")  
+                        else if error.msg == "El Password debe ser de al menos 8 caracteres"
+                            i(class="fas fa-lock mr-2")
+                        else if error.msg == "La contraseña debe coincidir con la anterior"
+                            i(class="fas fa-lock mr-2")  
+                        else if error.msg == "La fecha de nacimiento es obligatoria"
+                            i(class="fas fa-calendar-alt mr-2")
+                        else if error.msg == "Debes ser mayor de 18 años para registrarte"
+                            i(class="fas fa-exclamation-circle mr-2")
+                        p(class="text-sm font-bold")= error.msg
+                        button(class="ml-2 bg-transparent border-0 text-white" onclick="this.parentElement.style.display='none'") &times;
 
-        .mt-8.mx-auto.max-w-md 
+        .mt-8.mx-auto.max-w-md
             .bg-white.py-8.px-4.shadow
-                form.space-y-5(method="POST" action="/auth/registro" novalidate)
-                    input(type="hidden" name="_csrf" value= csrfToken) 
-                    div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="nombre") Tu Nombre
-                        input#nombre.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Escribe tu nombre" type="text" name="nombre" value= usuario ? usuario.nombre : '')
-                    div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="email") Email de Registro
-                        input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Escribe tu email" type="email" name="email" value= usuario ? usuario.email : '' ) 
-                    div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="password") Password
-                        input#password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Escribe tu password" type="password" name="password" )        
-                    div 
-                        label.block.text-sm.uppercase.text-gray-500.mb-3.font-bold(for="repetir_password") Repetir password
-                        input#repetir_password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Repite tu password" type="password" name="repetir_password")         
-                    
-                    div.flex.items-center.justify-between 
-                        a.text-gray-500.text-xs(href="/auth/login") ¿Ya tienes cuenta? Inicia Sesión
-                        a.text-gray-500.text-xs(href="/auth/olvide-password") Olvide mi Password 
+                form(method="POST" action="/auth/registro").space-y-5.px-6
+                    input(type="hidden" name="_csrf" value= csrfToken)
+                    div
+                        label.block.text-sm.uppercase.text-black.mb-2.font-bold Nombre Completo: 
+                        input#name.w-full.px-3.py-2.border-2.border-black.rounded-md(type="text" placeholder="Ej. Juanito Peréz" name="nombre" value=(usuario && usuario.name ? usuario.name : ""))
 
-                    input(class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Crear cuenta")    
+                    div
+                        label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold Email de Registro: 
+                        input#email.w-full.px-3.py-2.border-2.border-black.rounded-md(type="email" placeholder="Ej. usuario@paisdelasmaravillas.com" name="email" value=(usuario && usuario.email ? usuario.email : ""))
+
+                    div
+                        label.block.text-sm.uppercase.text-black.mb-2.font-bold Fecha de Nacimiento: 
+                        input#birthdate.w-full.px-3.py-2.border-2.border-black.rounded-md(type="date" name="fecha_nacimiento" value=(usuario && usuario.fecha_nacimiento ? usuario.fecha_nacimiento : ""))
+
+                    div
+                        label.block.text-sm.uppercase.text-black.mb-2.font-bold Contraseña: 
+                        input#password.w-full.px-3.py-2.border-2.border-black.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="password")
+
+                    div
+                        label.block.text-sm.uppercase.text-black.mb-2.font-bold Confirmar Contraseña: 
+                        input#password2.w-full.px-3.py-2.border-2.border-black.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="repetir_password")
+
+                    div.flex.items-center.justify-between
+                        a.text-gray-500.text-xs(href="/auth/login" class="hover:underline decoration-2 hover:decoration-azulrey") ¿Ya tienes cuenta? Inicia Sesión
+                        a.text-gray-500.text-xs(href="/auth/reset-password" class="hover:underline decoration-2 hover:decoration-azulrey") Recuperar Contraseña
+
+                    input(class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Crear Cuenta")
+
+    script.
+        document.querySelectorAll('.alert').forEach(error => {
+            setTimeout(() => {
+                error.classList.add('fade-out');  
+                setTimeout(() => {
+                    error.style.display = 'none';
+                }, 1000);  
+            }, 7000);  
+        });
+
+    style.
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-in-out;
+        }
+
+        .alert:hover {
+            transform: translateX(10px);  
+            cursor: pointer; 
+        }
