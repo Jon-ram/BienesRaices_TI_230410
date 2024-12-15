@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import Usuario from '../models/Usuario.js'
 import { generateID, generarJWT } from '../helpers/tokens.js'
 import { emailRegistro, emailOlvidePassword } from '../helpers/emails.js'
+import moment from 'moment'
 
 const formularioLogin = (req, res) => {
     res.render('auth/login', {
@@ -86,12 +87,30 @@ const formularioRegistro = (req, res) => {
 
 const registrar = async (req, res) => {
     console.log(req.body)
+    await check('nombre').notEmpty().withMessage('El nombre no puede ir vacío').run(req);
+    await check('email')
+        .notEmpty().withMessage('El correo electrónico es un campo obligatorio')
+        .isEmail().withMessage('El correo electrónico no tiene el formato correcto')
+        .run(req);
+    await check('password')
+        .notEmpty().withMessage('La contraseña es un campo obligatorio')
+        .isLength({ min: 8 }).withMessage('El Password debe ser de al menos 8 caracteres')
+        .run(req);
+    await check('repetir_password')
+        .equals(req.body.password).withMessage('La contraseña debe coincidir con la anterior')
+        .run(req);
 
-    //validación
-    await check('nombre').notEmpty().withMessage('El nombre no puede ir vacio').run(req)
-    await check('email').isEmail().withMessage('Eso no parece un email').run(req)
-    await check('password').isLength({ min: 6 }).withMessage('El password debe ser de almenos 6 caracteres').run(req)
-    await check('repetir_password').equals(req.body.password).withMessage('Los password no coinciden').run(req)
+    // Validación de la fecha de nacimiento
+    await check('fecha_nacimiento')
+        .notEmpty().withMessage('La fecha de nacimiento es obligatoria')
+        .custom((value) => {
+            const age = moment().diff(moment(value, 'YYYY-MM-DD'), 'years');
+            if (age < 18) {
+                throw new Error('Debes ser mayor de 18 años para registrarte');
+            }
+            return true;
+        })
+        .run(req);
 
     let resultado = validationResult(req)
 
