@@ -1,0 +1,54 @@
+extends ../layout/index
+
+block contenido
+    div.py-10
+        h1.text-center.font-extrabold.my-10.text-4xl.text-pigmentgreen Perfil de 
+            span.font-normal.text-black Usuario
+        
+        // Header con botones
+        .bg-white.shadow-md.fixed.top-0.left-0.w-full.z-10
+            .flex.justify-between.items-center.px-6.py-4
+                // Botón de Regresar (agregado)
+                a.text-gray-500.text-sm(href="javascript:history.back()" class="bg-pigmentgreen hover:bg-celadon-50 text-white py-2 px-6 rounded-lg") Regresar
+                // Botón de Inicio (estilo de botón más compacto)
+                a(href="/" class="text-white bg-emerald-400 hover:bg-celadon py-2 px-6 rounded-lg") Inicio
+                // Botón de Cerrar Sesión
+                form(method="POST" action="/auth/cerrar-sesion" class="inline-block")
+                    input(type="submit" class="bg-emerald-400 hover:bg-celadon py-2 px-6 rounded-lg" value="Cerrar Sesión")
+        
+        .mt-24.mx-auto.max-w-4xl
+            .bg-white.py-10.px-6.shadow-lg.rounded-lg.border.border-gray-200
+                .flex.items-center
+                    // Columna izquierda (foto de perfil)
+                    .w-48.h-48
+                        .flex.items-center.justify-center
+                            if usuario.foto_perfil
+                                img(src=`/uploads/${usuario.foto_perfil}` alt="Foto de perfil" class="w-full h-full rounded-full object-cover")
+                            else
+                                img(src="/images/default-profile.png" alt="Foto de perfil" class="w-full h-full rounded-full object-cover")
+
+                    // Columna derecha (datos del usuario)
+                    .ml-8.flex-grow
+                        .mb-6
+                            label.block.text-sm.uppercase.text-black.mb-2.font-bold Nombre Completo: 
+                            p.text-lg.font-medium.text-gray-800 #{usuario.nombre}
+                        .mb-6
+                            label.block.text-sm.uppercase.text-black.mb-2.font-bold Correo Electrónico: 
+                            p.text-lg.font-medium.text-gray-800 #{usuario.email}
+                        .mb-6
+                            label.block.text-sm.uppercase.text-black.mb-2.font-bold Fecha de Nacimiento: 
+                            p.text-lg.font-medium.text-gray-800 #{usuario.fecha_nacimiento}
+
+                // Formulario para actualizar foto
+                .flex.justify-between.mt-6
+                    // Espacio entre los botones
+                    .w-full.flex.justify-between
+                        // Seleccionar Foto
+                        form(id="foto-form", method="POST", action="/auth/usuario", enctype="multipart/form-data")
+                            label(for="foto_perfil" class="bg-pigmentgreen hover:bg-celadon-50 text-white py-2 px-6 rounded-lg cursor-pointer") 
+                                Seleccionar Foto
+                            input(id="foto_perfil" type="file" name="foto_perfil" accept="image/*" class="hidden")
+
+                        // Botón de Actualizar Foto
+                        form(id="foto-form-submit", method="POST", action="/auth/usuario", enctype="multipart/form-data")
+                            button(type="submit" class="bg-pigmentgreen hover:bg-celadon-50 text-white py-2 px-6 rounded-lg") Actualizar Foto
