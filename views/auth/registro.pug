@@ -2,14 +2,14 @@ extends ../layout/index
 
 block contenido
     div.py-10
-        h1.text-center.font-extrabold.my-10.text-4xl.text-black Bienes 
-            span.font-normal.text-orange-600 Raíces
-        h2.text-center.font-extrabold.text-2xl.text-gray-900= page
+        h1.text-center.font-extrabold.my-10.text-4xl.text-pigmentgreen Bienes 
+            span.font-normal.text-black Raíces
+        h2.text-center.font-extrabold.text-2xl= page
 
         if errores
             div(class="max-w-md mx-auto my-10")
                 each error in errores
-                    div(class="bg-red-600 text-white p-4 rounded-md flex items-center justify-between mb-2 alert fade-in")
+                    div(class="bg-redd text-white p-4 rounded-md flex items-center justify-between mb-2 alert fade-in")
                         // Iconos según tipo de error
                         if error.msg == "El nombre no puede ir vacío"
                             i(class="fas fa-user-times mr-2")  
@@ -32,33 +32,27 @@ block contenido
 
         .mt-8.mx-auto.max-w-md
             .bg-white.py-8.px-4.shadow
-                form(method="POST" action="/auth/registro").space-y-5.px-6
+                form(method="POST" action="/auth/registro" noValidate).space-y-5.px-6
                     input(type="hidden" name="_csrf" value= csrfToken)
                     div
                         label.block.text-sm.uppercase.text-black.mb-2.font-bold Nombre Completo: 
-                        input#name.w-full.px-3.py-2.border-2.border-black.rounded-md(type="text" placeholder="Ej. Juanito Peréz" name="nombre" value=(usuario && usuario.name ? usuario.name : ""))
-
+                        input#name.w-full.px-3.py-2.border-2.border-black.rounded-md(type="text" placeholder="Ej. Juanito Peréz" name="nombre" value=(usuario && usuario.nombre ? usuario.nombre : ""))
                     div
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold Email de Registro: 
                         input#email.w-full.px-3.py-2.border-2.border-black.rounded-md(type="email" placeholder="Ej. usuario@paisdelasmaravillas.com" name="email" value=(usuario && usuario.email ? usuario.email : ""))
-
                     div
                         label.block.text-sm.uppercase.text-black.mb-2.font-bold Fecha de Nacimiento: 
                         input#birthdate.w-full.px-3.py-2.border-2.border-black.rounded-md(type="date" name="fecha_nacimiento" value=(usuario && usuario.fecha_nacimiento ? usuario.fecha_nacimiento : ""))
-
                     div
                         label.block.text-sm.uppercase.text-black.mb-2.font-bold Contraseña: 
                         input#password.w-full.px-3.py-2.border-2.border-black.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="password")
-
                     div
                         label.block.text-sm.uppercase.text-black.mb-2.font-bold Confirmar Contraseña: 
                         input#password2.w-full.px-3.py-2.border-2.border-black.rounded-md(type="password" placeholder="Minimo de 8 caracteres" name="repetir_password")
-
                     div.flex.items-center.justify-between
                         a.text-gray-500.text-xs(href="/auth/login" class="hover:underline decoration-2 hover:decoration-azulrey") ¿Ya tienes cuenta? Inicia Sesión
-                        a.text-gray-500.text-xs(href="/auth/reset-password" class="hover:underline decoration-2 hover:decoration-azulrey") Recuperar Contraseña
-
-                    input(class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 cursor-pointer" type="submit" value="Crear Cuenta")
+                        a.text-gray-500.text-xs(href="/auth/olvide-password" class="hover:underline decoration-2 hover:decoration-azulrey") Recuperar Contraseña
+                    input(class="w-full bg-pigmentgreen hover:bg-celadon-50 text-black font-bold py-3 cursor-pointer" type="submit" value="Crear Cuenta")
 
     script.
         document.querySelectorAll('.alert').forEach(error => {
@@ -92,4 +86,5 @@ block contenido
         .alert:hover {
             transform: translateX(10px);  
             cursor: pointer; 
+            transition: transform 0.3s ease; 
         }

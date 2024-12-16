@@ -4,6 +4,8 @@ import Usuario from '../models/Usuario.js'
 import { generateID, generarJWT } from '../helpers/tokens.js'
 import { emailRegistro, emailOlvidePassword } from '../helpers/emails.js'
 import moment from 'moment'
+import pool from '../config/db.js'; 
+import multer from 'multer';
 
 const formularioLogin = (req, res) => {
     res.render('auth/login', {
@@ -112,8 +114,13 @@ const registrar = async (req, res) => {
         })
         .run(req);
 
-    let resultado = validationResult(req)
+    // Validación del alias
+    await check('alias')
+        .notEmpty().withMessage('El alias es un campo obligatorio')
+        .isLength({ min: 3 }).withMessage('El alias debe tener al menos 3 caracteres')
+        .run(req);
 
+    let resultado = validationResult(req)
 
     //verificar que el resultado este vacio
     if (!resultado.isEmpty()) {
@@ -123,14 +130,15 @@ const registrar = async (req, res) => {
             errores: resultado.array(),
             usuario: {
                 nombre: req.body.nombre,
-                email: req.body.email
+                email: req.body.email,
+                alias: req.body.alias,
+                fecha_nacimiento: req.body.fecha_nacimiento
             }
         })
     }
 
     //Extraer los datos
-
-    const { nombre, email, password } = req.body
+    const { nombre, email, password, foto = '', alias, fecha_nacimiento } = req.body
 
     //verificar que el usuario no este duplicado
     const existeUsuario = await Usuario.findOne({ where: { email } })
@@ -138,10 +146,12 @@ const registrar = async (req, res) => {
         return res.render('auth/registro', {
             pagina: 'Crear cuenta',
             csrfToken: req.csrfToken(),
-            errores: [{ msg: 'El usuario ya esta Registrado' }],
+            errores: [{ msg: 'El usuario ya está registrado' }],
             usuario: {
                 nombre: req.body.nombre,
-                email: req.body.email
+                email: req.body.email,
+                alias: req.body.alias,
+                fecha_nacimiento: req.body.fecha_nacimiento
             }
         })
     }
@@ -151,21 +161,23 @@ const registrar = async (req, res) => {
         nombre,
         email,
         password,
+        foto,
+        alias,
+        fechaDeNacimiento: fecha_nacimiento,
         token: generateID()
     })
 
-    //Enviar email de confirmacion
+    //Enviar email de confirmación
     emailRegistro({
         nombre: usuario.nombre,
         email: usuario.email,
         token: usuario.token
     })
 
-
-    //Mostrar mensaje de confirmación
-    res.render('templates/message', {
-        pagina: 'Cuenta creada correctamente',
-        mensaje: 'Hemos enviado un email de confirmación, presiona en el enlace'
+    res.render('auth/agregar-foto', {
+        pagina: `Agregar Imagen: ${usuario.nombre}`,
+        csrfToken: req.csrfToken(),
+        usuario
     })
 }
 
@@ -303,16 +315,155 @@ const nuevoPassword = async (req, res) => {
 
 }
 
-const mostrarUsuario = (req, res) => {
-    res.render('auth/usuario', {
-        page: 'Perfil de Usuario',
-        usuario: req.usuario || {} // Asegúrate de que req.usuario esté definido
+
+const subirFotoPerfil = async (req, res) => {
+
+    const { id } = req.params
+    //Validar que la propiedad exista
+
+    const usuario = await Usuario.findByPk(id)
+
+    if (!usuario) {
+        return res.render('auth/registro', {
+            pagina: 'Crear cuenta',
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: 'El usuario no esta Registrado' }],
+            usuario: {
+                nombre: req.body.nombre,
+                email: req.body.email
+            }
+        })
+    }
+ 
+        //Enviar email de confirmacion
+        emailRegistro({
+            nombre: usuario.nombre,
+            email: usuario.email,
+            token: usuario.token
+        })
+    
+}
+
+const almacenarFotoPerfil = async (req, res) => {
+    const { id } = req.params;
+
+    // Validar que el usuario exista
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+        return res.render('auth/registro', {
+            pagina: 'Crear cuenta',
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: 'El usuario no está registrado' }],
+            usuario: {
+                nombre: req.body.nombre,
+                email: req.body.email,
+            },
+        });
+    }
+
+    try {
+        console.log(req.file);
+
+        // Almacenar la imagen del usuario
+        usuario.foto = req.file.filename;
+        await usuario.save();
+
+        // Enviar el correo de confirmación
+        emailRegistro({
+            nombre: usuario.nombre,
+            email: usuario.email,
+            token: usuario.token,
+        });
+
+        // Mostrar la página de mensaje de confirmación
+        return res.render('templates/message', {
+            pagina: 'Cuenta creada correctamente',
+            mensaje: 'Hemos enviado un email de confirmación, presiona en el enlace.',
+        });
+    } catch (error) {
+        console.log(error);
+
+        // Manejar errores en la subida de la imagen
+        return res.render('auth/registro', {
+            pagina: 'Crear cuenta',
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: 'La subida de la imagen falló, intenta de nuevo.' }],
+            usuario: {
+                nombre: req.body.nombre,
+                email: req.body.email,
+            },
+        });
+    }
+};
+
+ const mostrarUsuario = async (req, res) => {
+    const { id } = req.params;
+
+    // Buscar el usuario por ID
+    const usuario = await Usuario.findByPk(id, {
+        attributes: ['nombre', 'email', 'alias', 'fechaDeNacimiento','foto']
     });
+
+    if (!usuario) {
+        return res.redirect('/404');
+    }
+
+    res.render('usuario/perfil', {
+        usuario,
+        pagina: `Perfil de ${usuario.nombre}`,
+        csrfToken: req.csrfToken()
+    });
+};
+
+// Mostrar el formulario para editar perfil
+const mostrarFormularioEditar = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const usuario = await Usuario.findByPk(id);
+        if (!usuario) {
+            return res.redirect('/404'); // Redirigir si no se encuentra el usuario
+        }
+        res.render('usuario/editar', {
+            usuario, // Pasamos los datos del usuario a la vista
+            pagina: 'Editar Perfil', // Título de la página
+            csrfToken: req.csrfToken(), // Asegúrate de pasar el token CSRF
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al cargar el formulario de edición');
+    }
+};
+
+// Actualizar el perfil del usuario
+const actualizarPerfil = async (req, res) => {
+    const { id } = req.params;
+    const { alias, fechaNacimiento } = req.body;
+    try {
+        // Buscar al usuario por su ID
+        const usuario = await Usuario.findByPk(id);
+        if (!usuario) {
+            return res.redirect('/404'); // Redirigir si no se encuentra el usuario
+        }
+        // Actualizar los datos del usuario
+        usuario.alias = alias || usuario.alias;
+        usuario.fechaNacimiento = fechaNacimiento || usuario.fechaNacimiento;
+        if (req.file) {
+            usuario.foto = req.file.filename;
+        }
+        // Guardar los cambios
+        await usuario.save();
+        res.redirect(`/usuario/${id}`); // Redirigir a la página del perfil actualizado
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al actualizar el perfil');
+    }
 };
 
 export {
     formularioLogin,
     cerrarSesion,
+    mostrarUsuario,
     formularioRegistro,
     autenticar,
     registrar,
@@ -321,5 +472,8 @@ export {
     resetPassword,
     comprobarToken,
     nuevoPassword,
-    mostrarUsuario
+    subirFotoPerfil,
+    almacenarFotoPerfil,
+    mostrarFormularioEditar,
+    actualizarPerfil
 }
