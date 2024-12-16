@@ -38,6 +38,9 @@ block contenido
                         label.block.text-sm.uppercase.text-black.mb-2.font-bold Nombre Completo: 
                         input#name.w-full.px-3.py-2.border-2.border-black.rounded-md(type="text" placeholder="Ej. Juanito Peréz" name="nombre" value=(usuario && usuario.nombre ? usuario.nombre : ""))
                     div
+                        label.block.text-sm.uppercase.text-black.mb-2.font-bold Alias: 
+                        input#alias.w-full.px-3.py-2.border-2.border-black.rounded-md(type="text" placeholder="Ej. juanperez123" name="alias" value=(usuario && usuario.alias ? usuario.alias : ""))
+                    div
                         label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold Email de Registro: 
                         input#email.w-full.px-3.py-2.border-2.border-black.rounded-md(type="email" placeholder="Ej. usuario@paisdelasmaravillas.com" name="email" value=(usuario && usuario.email ? usuario.email : ""))
                     div
