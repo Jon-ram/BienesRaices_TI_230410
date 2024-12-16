@@ -74,16 +74,14 @@ const crear = async (req, res) => {
         datos: {}
     })
 }
-
 const guardar = async (req, res) => {
-    //Validacion
-    let resultado = validationResult(req)
+    let resultado = validationResult(req);
 
     if (!resultado.isEmpty()) {
         const [categorias, precios] = await Promise.all([
             Categoria.findAll(),
             Precio.findAll()
-        ])
+        ]);
 
         return res.render('propiedades/crear', {
             pagina: 'Crear Propiedad',
@@ -92,15 +90,12 @@ const guardar = async (req, res) => {
             precios,
             errores: resultado.array(),
             datos: req.body
-        })
-
-
+        });
     }
 
-    //Crear registro
-    const { titulo, descripcion, habitaciones, estacionamiento, wc, calle, lat, lng, precio: precioID, categoria: categoriaID } = req.body
+    const { titulo, descripcion, habitaciones, estacionamiento, wc, calle, lat, lng, precio: precioID, categoria: categoriaID, operacion } = req.body;
+    const { id: usuarioID } = req.usuario;
 
-    const { id: usuarioID } = req.usuario
     try {
         const propiedadGuardada = await Propiedad.create({
             titulo,
@@ -113,19 +108,18 @@ const guardar = async (req, res) => {
             lng,
             precioID,
             categoriaID,
+            operacion,
             usuarioID,
-            imagen: ''
-        })
+            imagen: '',
+            operacion
+        });
 
-        const { id } = propiedadGuardada
-
-        res.redirect(`/propiedades/agregar-imagen/${id}`)
-
+        res.redirect(`/propiedades/agregar-imagen/${propiedadGuardada.id}`);
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        res.redirect('/mis-propiedades');
     }
-
-}
+};
 
 const agregarImagen = async (req, res) => {
 
@@ -228,45 +222,34 @@ const editar = async (req, res) => {
 }
 
 const guardarCambios = async (req, res) => {
-
-    //verificcar la Validacion
-    let resultado = validationResult(req)
+    let resultado = validationResult(req);
 
     if (!resultado.isEmpty()) {
         const [categorias, precios] = await Promise.all([
             Categoria.findAll(),
             Precio.findAll()
-        ])
+        ]);
 
         return res.render('propiedades/editar', {
-            pagina: 'Crear Propiedad',
+            pagina: 'Editar Propiedad',
             csrfToken: req.csrfToken(),
             categorias,
             precios,
             errores: resultado.array(),
             datos: req.body
-        })
+        });
     }
 
-    const { id } = req.params
+    const { id } = req.params;
+    const { titulo, descripcion, habitaciones, estacionamiento, wc, calle, lat, lng, precio: precioID, categoria: categoriaID, operacion } = req.body;
 
-    //validar que la propiedad exista
-    const propiedad = await Propiedad.findByPk(id)
+    const propiedad = await Propiedad.findByPk(id);
 
-    if (!propiedad) {
-        return res.redirect('/mis-propiedades')
+    if (!propiedad || propiedad.usuarioID !== req.usuario.id) {
+        return res.redirect('/mis-propiedades');
     }
-
-    //Revisar quin visita la URL sea dueño de la propeidd
-    if (propiedad.usuarioID.toString() !== req.usuario.id.toString()) {
-        return res.redirect('/mis-propiedades')
-    }
-
-    //Rescribir el objeto y actualizar la bd
 
     try {
-        const { titulo, descripcion, habitaciones, estacionamiento, wc, calle, lat, lng, precio: precioID, categoria: categoriaID } = req.body
-
         propiedad.set({
             titulo,
             descripcion,
@@ -277,18 +260,16 @@ const guardarCambios = async (req, res) => {
             lat,
             lng,
             precioID,
-            categoriaID
-        })
+            categoriaID,
+            operacion
+        });
 
         await propiedad.save();
-
-        res.redirect('/mis-propiedades')
-
+        res.redirect('/mis-propiedades');
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-
-}
+};
 
 const eliminar = async (req, res) => {
     const { id } = req.params
