@@ -10,11 +10,13 @@ block contenido
         h2.text-center.text-2xl.font-extrabold= pagina
 
         div(class="bg-white shadow py-8 px-4 rounded mx-auto max-w-4xl my-10 md:px-10")
-            form(id="imagen" class="dropzone border-dashed border-2 w-full min:h-96 h-auto rounded flex-col justify-center items-center" method="POST" action=`/propiedades/agregar-imagen/${propiedad.id}` data-context="propiedad")
+            form(id="imagen" class="dropzone border-dashed border-2 w-full min:h-96 h-auto rounded flex-col justify-center items-center" method="POST" action=`/auth/registro/${usuario.id}` data-context="registro")
                 input(type="hidden" name="_csrf" value= csrfToken)
                 
 
             button(id="publicar" class="mt-5 w-full py-3 bg-emerald-400 hover:bg-celadon rounded text-white font-bold uppercase cursor-pointer" type="button") Publicar Propiedad   
+
+    pre= JSON.stringify(usuario, null, 2)
 
 block scripts 
     script(src="/js/agregarImagen.js")
