@@ -5,7 +5,7 @@ block styles
 
 block contenido
     div(class="py-5")
-        h1(id="titulo" class="text-4xl my-10 font-extrabold text-center") Perfil de Usuario
+        h1(id="titulo" class="text-4xl my-10 font-extrabold text-center text-black") Perfil de Usuario
 
         div(class="mt-5 md:flex md:gap-4 md:items-start")
             div(class="md:w-2/3 bg-white shadow rounded-lg") 
@@ -36,7 +36,7 @@ block contenido
                         input(type="hidden" name="_csrf" value=csrfToken)
                         label(for="alias", class="font-bold text-gray-700") Cambiar Alias:
                         input(type="text" name="alias" id="alias" value=usuario.alias placeholder="Ingresa tu alias" class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow")
-                        button(type="submit", class="bg-green-600 text-white font-bold rounded-lg px-4 py-2") Guardar Alias
+                        button(type="submit", class="bg-orange-600 text-white font-bold rounded-lg px-4 py-2") Guardar Alias
 
             aside(class="md:w-1/3 bg-white shadow rounded-lg p-5")
                 h1(class="text-center py-10 leading-6 text-2xl font-bold text-gray-900") Opciones

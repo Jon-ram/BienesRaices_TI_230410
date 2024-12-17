@@ -1,6 +1,5 @@
-import { Precio, Categoria, Propiedad } from "../models/index.js";
+import { Precio, Categoria, Propiedad,Usuario } from "../models/index.js";
 import { Sequelize } from 'sequelize';
-
 const inicio = async (req, res) => {
     const [categorias, precios, casas, departamentos, establecimientosRenta, establecimientosVenta] = await Promise.all([
         Categoria.findAll({ raw: true }),
@@ -14,6 +13,11 @@ const inicio = async (req, res) => {
                 {
                     model: Precio,
                     as: 'precio'
+                },
+                {
+                    model: Usuario,
+                    as: 'usuario',
+                    attributes: ['alias', 'foto'] // Agregar los atributos del usuario que necesitas
                 }
             ],
             order: [
@@ -29,6 +33,11 @@ const inicio = async (req, res) => {
                 {
                     model: Precio,
                     as: 'precio'
+                },
+                {
+                    model: Usuario,
+                    as: 'usuario',
+                    attributes: ['alias', 'foto'] // Agregar los atributos del usuario que necesitas
                 }
             ],
             order: [
@@ -45,6 +54,11 @@ const inicio = async (req, res) => {
                 {
                     model: Precio,
                     as: 'precio'
+                },
+                {
+                    model: Usuario,
+                    as: 'usuario',
+                    attributes: ['alias', 'foto'] // Agregar los atributos del usuario que necesitas
                 }
             ],
             order: [
@@ -61,6 +75,11 @@ const inicio = async (req, res) => {
                 {
                     model: Precio,
                     as: 'precio'
+                },
+                {
+                    model: Usuario,
+                    as: 'usuario',
+                    attributes: ['alias', 'foto'] // Agregar los atributos del usuario que necesitas
                 }
             ],
             order: [
@@ -77,6 +96,7 @@ const inicio = async (req, res) => {
         departamentos,
         propiedadesRenta: establecimientosRenta,  
         propiedadesVenta: establecimientosVenta,
+        usuario: req.usuario,  // Pasar el usuario
         csrfToken: req.csrfToken()
     });
 };
@@ -118,49 +138,50 @@ const categoria = async (req, res) => {
         pagina: `${categoria.nombre}s en venta o renta`,
         propiedadesRenta,
         propiedadesVenta,
+        usuario: req.usuario,  // Pasar el usuario
         csrfToken: req.csrfToken()
     });
 };
 
-    const noEncontrado = (req, res) => {
-        res.render('404',{
-            pagina: 'No Encontrado',
-            csrfToken: req.csrfToken()
-        })
+const noEncontrado = (req, res) => {
+    res.render('404',{
+        pagina: 'No Encontrado',
+        usuario: req.usuario,  // Pasar el usuario
+        csrfToken: req.csrfToken()
+    });
+}
+
+const buscador = async (req, res) => {
+    const { termino } = req.body;
+
+    // Validar que termino no esté vacío
+    if (!termino.trim()) {
+        return res.redirect('back');
     }
 
-    const buscador = async (req, res) => {
-        const {termino} = req.body
+    // Consultar las propiedades
+    const propiedades = await Propiedad.findAll({
+        where: {
+            titulo: {
+                [Sequelize.Op.like]: '%' + termino + '%'
+            }
+        },
+        include: [
+            { model: Precio, as: 'precio' }
+        ]
+    });
 
-        //validar que termino no este vacio
+    res.render('busqueda', {
+        pagina: 'Resultados de la búsqueda',
+        propiedades,
+        usuario: req.usuario,  // Pasar el usuario
+        csrfToken: req.csrfToken()
+    });
+}
 
-        if(!termino.trim()){
-            return res.redirect('back')
-        }
-
-        //consultar las propiedades
-
-        const propiedades = await Propiedad.findAll({
-            where: {
-                titulo: {
-                    [Sequelize.Op.like] : '%' + termino + '%'
-                }
-            },
-            include: [
-                {model: Precio , as: 'precio'}
-            ]
-        })
-
-        res.render('busqueda',{
-            pagina: 'Resultados de la busqueda',
-            propiedades,
-            csrfToken: req.csrfToken()
-        })
-    }
-
-    export {
-        inicio,
-        categoria,
-        noEncontrado,
-        buscador
-    }
+export {
+    inicio,
+    categoria,
+    noEncontrado,
+    buscador
+};

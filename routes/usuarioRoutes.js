@@ -32,6 +32,12 @@ router.post('/registro', registrar);
 // Ruta para subir la foto de perfil
 router.get('/registro/:id', subirFotoPerfil);
 router.post('/registro/:id', upload.single('imagen'), almacenarFotoPerfil);
+router.get('/mensaje',async (req, res) => {
+    res.render('templates/message',{
+        pagina: 'Cuenta creada correctamente',
+        mensaje:'Hemos enviado un email de confirmación, presiona en el enlace. '
+        })
+    });
 
 // Confirmar cuenta
 router.get('/confirmar/:token', confirmar);
