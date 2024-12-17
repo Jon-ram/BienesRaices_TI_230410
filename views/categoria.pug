@@ -5,7 +5,7 @@ block contenido
         h2(class="text-center text-4xl font-extrabold pt-10")= pagina
 
         if propiedadesVenta.length
-            h3(class="text-2xl font-bold text-center mt-8 text-green-600") Propiedades en Venta
+            h3(class="text-2xl font-bold text-center mt-8 text-black") Propiedades en Venta
             div(class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5")
                 each propiedad in propiedadesVenta
                     include ./templates/card
@@ -13,7 +13,7 @@ block contenido
             p(class="text-center text-gray-800 text-lg py-10") No hay propiedades en venta para esta categoría.
 
         if propiedadesRenta.length
-            h3(class="text-2xl font-bold text-center mt-8 text-green-600") Propiedades en Renta
+            h3(class="text-2xl font-bold text-center mt-8 text-black") Propiedades en Venta
             div(class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5")
                 each propiedad in propiedadesRenta
                     include ./templates/card

@@ -1,21 +1,22 @@
-header.bg-gray-800.p-4
-    .container.mx-auto.flex.justify-between.items-center
+header.bg-orange.p-4 
+    .container.mx-auto.flex.justify-between.items-center 
         a(href="/")
-            h1.text-2xl.text-white.font-extrabold.text-center Bienes
-                span.font-normal.text-orange-500 Raíces
+            h1.text-2xl.text-white.font-extrabold.text-center.text-pigmentgrenn Bienes  
+                span.text-2xl.text-black.font-extrabold.text-center Raíces
 
         nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white hidden") 
-            a(href="/auth/registro" class="hover:text-orange-400") Crear cuenta
-            a(href="/auth/login" class="hover:text-orange-400") Iniciar Sesión
+            a(href="/auth/registro" class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Crear cuenta 
+            a(href="/auth/login" class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Iniciar Sesión
 
-div(class="bg-gray-900 py-5 hidden lg:block")
+div(class="bg-wine py-5 hidden lg:block")
     div(class="container mx-auto flex justify-between")
         nav(class="flex gap-4 items-center") 
-            a(href="/categorias/1" class="text-sm font-bold uppercase text-white hover:text-orange-400") Casas
-            a(href="/categorias/2" class="text-sm font-bold uppercase text-white hover:text-orange-400") Departamentos
-            a(href="/categorias/3" class="text-sm font-bold uppercase text-white hover:text-orange-400") Bodegas
-            a(href="/categorias/4" class="text-sm font-bold uppercase text-white hover:text-orange-400") Terrenos
-            a(href="/categorias/5" class="text-sm font-bold uppercase text-white hover:text-orange-400") Cabañas
+            a(href="/categorias/1" class="text-sm font-bold uppercase text-white mx-2 hover:bg-pigmentgreen py-2 px-7 rounded-lg") Casas
+            a(href="/categorias/2" class="text-sm font-bold uppercase text-white mx-1 hover:bg-pigmentgreen py-1 px-7 rounded-lg") Departamentos
+            a(href="/categorias/3" class="text-sm font-bold uppercase text-white mx-1 hover:bg-pigmentgreen py-1 px-7 rounded-lg") Bodegas
+            a(href="/categorias/4" class="text-sm font-bold uppercase text-white mx-1 hover:bg-pigmentgreen py-1 px-7 rounded-lg") Terrenos
+            a(href="/categorias/5" class="text-sm font-bold uppercase text-white mx-1 hover:bg-pigmentgreen py-1 px-7 rounded-lg") Cabañas
+            a(href="/categorias/6" class="text-sm font-bold uppercase text-white mx-1 hover:bg-pigmentgreen py-1 px-7 rounded-lg") Establecimientos 
 
         form(action="/buscador" method="POST" class="flex gap-3 items-center") 
             input(type="hidden" name="_csrf" value= csrfToken)
@@ -23,4 +24,5 @@ div(class="bg-gray-900 py-5 hidden lg:block")
             
             input(type="text" id="termino" name="termino" placeholder="Buscar propiedades" class="p-2 rounded-lg shadow text-sm")
 
-            input(type="submit" class="bg-red-600 hover:bg-red-700 rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm" value="Buscar" )
+            input(type="submit" class="bg-celadon-300 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm" value="Buscar" )
+            pre=JSON.stringify(propiedad,null,2)

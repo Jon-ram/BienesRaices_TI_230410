@@ -333,58 +333,47 @@ const subirFotoPerfil = async (req, res) => {
                 email: req.body.email
             }
         })
-    }
- 
-        //Enviar email de confirmacion
-        emailRegistro({
-            nombre: usuario.nombre,
-            email: usuario.email,
-            token: usuario.token
-        })
-    
+    }   
 }
 
 const almacenarFotoPerfil = async (req, res) => {
     const { id } = req.params;
 
-    // Validar que el usuario exista
-    const usuario = await Usuario.findByPk(id);
-
-    if (!usuario) {
-        return res.render('auth/registro', {
-            pagina: 'Crear cuenta',
-            csrfToken: req.csrfToken(),
-            errores: [{ msg: 'El usuario no está registrado' }],
-            usuario: {
-                nombre: req.body.nombre,
-                email: req.body.email,
-            },
-        });
-    }
-
     try {
-        console.log(req.file);
+        // Validar usuario
+        const usuario = await Usuario.findByPk(id);
+        if (!usuario) {
+            console.log('Usuario no encontrado');
+            return res.render('auth/registro', {
+                pagina: 'Crear cuenta',
+                csrfToken: req.csrfToken(),
+                errores: [{ msg: 'El usuario no está registrado' }],
+                usuario: {
+                    nombre: req.body.nombre,
+                    email: req.body.email,
+                },
+            });
+        }
+
+        // Depuración para verificar req.file
+        console.log('Archivo recibido:', req.file);
+
+        if (!req.file) {
+            throw new Error('No se subió ninguna imagen');
+        }
 
         // Almacenar la imagen del usuario
         usuario.foto = req.file.filename;
         await usuario.save();
 
-        // Enviar el correo de confirmación
-        emailRegistro({
-            nombre: usuario.nombre,
-            email: usuario.email,
-            token: usuario.token,
-        });
+        console.log('Imagen almacenada con éxito, redirigiendo...');
 
-        // Mostrar la página de mensaje de confirmación
-        return res.render('templates/message', {
-            pagina: 'Cuenta creada correctamente',
-            mensaje: 'Hemos enviado un email de confirmación, presiona en el enlace.',
-        });
+        // Después de guardar la foto y procesar la lógica
+        return res.redirect('/auth/mensaje');
+
     } catch (error) {
-        console.log(error);
+        console.error('Error en el controlador:', error);
 
-        // Manejar errores en la subida de la imagen
         return res.render('auth/registro', {
             pagina: 'Crear cuenta',
             csrfToken: req.csrfToken(),
@@ -396,6 +385,7 @@ const almacenarFotoPerfil = async (req, res) => {
         });
     }
 };
+
 
  const mostrarUsuario = async (req, res) => {
     const { id } = req.params;

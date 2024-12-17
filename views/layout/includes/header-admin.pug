@@ -1,11 +1,16 @@
-header.bg-gray-800.p-4
-    .container.mx-auto.flex.justify-between.items-center
-        h1.text-2xl.text-white.font-extrabold.text-center Bienes
-            span.font-normal.text-orange-500 Raíces
+header.bg-wine.p-4 
+    .container.mx-auto.flex.justify-between.items-center 
+        h1.text-2xl.text-white.font-extrabold.text-center Bienes 
+            span.font-extrabold.text-orange-600 Raíces
 
-        nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white hidden")
-            a(href="/mis-propiedades" class="hover:text-orange-400") Mis propiedades
-            a(href="" class="hover:text-orange-400") Mi perfil
-            form(action="/auth/cerrar-sesion" method="POST")
+        nav(class="my-5 text-sm md:flex md:items-center md:gap-3 font-bold text-white hidden") 
+            a.text-gray-500.text-sm(href="javascript:history.back()" class="bg-emerald-400 hover:bg-celadon text-white py-2 px-6 rounded-lg") Regresar
+            a(href="/" class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Inicio
+            a(href="/mis-propiedades" class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Mis propiedades 
+            if usuario
+               a(href=`/usuario/${usuario.id}` class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Mi perfil
+            else
+                a(href="/auth/login" class="bg-emerald-400 hover:bg-celadon rounded-lg text-white uppercase font-bold p-2 cursor-pointer text-sm") Iniciar Sesión
+            form(action="/auth/cerrar-sesion" method="POST")  
                 input(type="hidden" name="_csrf" value= csrfToken)
-                input(type="submit" class="bg-red-600 py-2 px-10 rounded-lg text-white hover:bg-red-700" value="Cerrar Sesión")
+                input(type="submit" class="bg-emerald-400 hover:bg-celadon py-2 px-10 rounded-lg" value="Cerrar Sesión")
